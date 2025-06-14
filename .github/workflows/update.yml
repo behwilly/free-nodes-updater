@@ -2,8 +2,8 @@ name: Auto Update Free Nodes
 
 on:
   schedule:
-    - cron: "0 * * * *"  # 每小時 UTC 執行一次（台灣時區 +8，為每小時 8 分）
-  workflow_dispatch:      # 支援手動執行
+    - cron: "0 * * * *"  # 每小時執行一次（UTC 時間）
+  workflow_dispatch:
 
 jobs:
   update:
