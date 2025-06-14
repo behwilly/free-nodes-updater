@@ -2,7 +2,7 @@ name: Auto Update Free Nodes
 
 on:
   schedule:
-    - cron: "0 * * * *"  # 每小時執行一次（UTC 時間）
+    - cron: "0 * * * *"  # 每小時執行一次（UTC）
   workflow_dispatch:
 
 jobs:
@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # <== 重點：允許 pull & rebase
 
     - name: Set up Python
       uses: actions/setup-python@v4
