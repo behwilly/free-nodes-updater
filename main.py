@@ -1,34 +1,30 @@
 # main.py
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
-import re
+import base64
 
-def fetch_nodes():
-    url = "https://free-ss.site"
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
+# ========= 抓取節點（以 free-ss.site 為例） =========
 
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    
-    soup = BeautifulSoup(response.text, "html.parser")
+url = 'https://free-ss.site'
+resp = requests.get(url)
+soup = BeautifulSoup(resp.text, 'html.parser')
 
-    # 抓取所有 ss:// 或 vmess:// 開頭的節點
-    pattern = re.compile(r'(ss://[a-zA-Z0-9\-_:=@.]+|vmess://[a-zA-Z0-9+/=]+)')
-    matches = pattern.findall(soup.text)
+# 節點內容以 vmess://, ss://, trojan:// 開頭
+raw_nodes = []
+for link in soup.find_all('a'):
+    href = link.get('href', '')
+    if any(href.startswith(proto) for proto in ['vmess://', 'ss://', 'trojan://']):
+        raw_nodes.append(href.strip())
 
-    # 去重
-    matches = list(set(matches))
+# ========= 輸出 nodes.txt =========
 
-    # 儲存到檔案
-    with open("nodes.txt", "w", encoding="utf-8") as f:
-        f.write(f"# 自動更新時間：{datetime.utcnow()} UTC\n\n")
-        for node in matches:
-            f.write(node + "\n")
+with open('nodes.txt', 'w', encoding='utf-8') as f:
+    f.write('\n'.join(raw_nodes))
 
-    print(f"共抓取 {len(matches)} 個節點。")
+# ========= 輸出 base64.txt =========
 
-if __name__ == "__main__":
-    fetch_nodes()
+all_nodes_text = '\n'.join(raw_nodes)
+encoded = base64.b64encode(all_nodes_text.encode('utf-8')).decode('utf-8')
+
+with open('base64.txt', 'w', encoding='utf-8') as f:
+    f.write(encoded)
